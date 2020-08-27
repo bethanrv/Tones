@@ -1,0 +1,225 @@
+<!-- 
+Tones
+JS project to visualize the math in music
+- Plays one or more pitches together and renders the resulting wave
+- e.g. the tone, A, renders a single sine wave resonating at 440 hertz
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Tones
+	</title>
+
+	<!--Pull in libraries p5js -->
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+
+
+</head>
+<body style="background-color: black; color: white; font-size: 2em; font-family: Courier New">
+
+	<!-- range input sliders  -->
+	<div class="slidecontainer" style="width: 100%;">
+		<input name="timeSlider" oninput="initializeTimeFactors()" type="range" min="1" max="100" value="50" class="slider" id="dilationSlider">
+
+		<label for="timeSlider"> Time Dilation </label><br>		
+
+		<input name="zoomSlider" oninput="initializeZoomFactors()" type="range" min="1" max="100" value="50" class="slider" id="zoomSlider">
+
+		<label for="zoomSlider"> Zoom Depth </label><br>		
+
+	  	<input type="radio" id="single" name="note" value="single note" oninput="changeWaveSetting('single'); initializeWaves();">
+
+	  	<label for="note">Single Note</label><br>		
+
+		<input type="radio" id="octave" name="note" value="octave" oninput="changeWaveSetting('octave'); initializeWaves();">
+
+		<label for="note">Octave</label><br>
+
+		<input type="radio" id="fifth" name="note" value="fifth" oninput="changeWaveSetting('fifth'); initializeWaves();">
+
+		<label for="note">Fifth</label><br>
+
+		<input type="radio" id="major" name="note" value="major" oninput="changeWaveSetting('major'); initializeWaves();">
+
+		<label for="note">Major</label><br>
+
+		<input type="radio" id="minor" name="note" value="minor" oninput="changeWaveSetting('minor'); initializeWaves();">
+
+		<label for="note">Minor</label><br>
+
+
+	</div>
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+	//hyper params
+	let waveSetting = 'single';
+	let timeDilationMin = 0.00000005;
+	//let timeDilation = 0.000005; // 1 = real speed
+	let timeDilation = 0.001;
+	let inputScale = 7;
+
+	//let zoomFactor = 0.000005; // 1 for canvas fit
+	let zoomMin = 0.0000005;
+	let zoomFactor = 1;
+
+	// initialize canvas
+	function setup(){
+		createCanvas(windowWidth, windowHeight);
+		initSounds();
+		initializeWaves();
+	}
+
+	function initializeTimeFactors(){
+		let inputFactor = document.getElementById('dilationSlider').value/100;
+
+		timeDilation = Math.pow(inputFactor, inputScale) * 1
+	}
+
+	function initializeZoomFactors(){
+		let inputFactor = document.getElementById('zoomSlider').value/100;
+
+		zoomFactor = Math.pow(inputFactor, inputScale) * 1
+	}
+
+
+	//change wave setting
+	function changeWaveSetting(setting){
+		waveSetting = setting;
+	}
+
+	//init sounds
+	let sounds = {}
+	function initSounds(){
+		sounds['A4'] = new Audio('https://srv-file10.gofile.io/download/NxUTRf/A4.mp3');
+		sounds['C5'] = new Audio('https://srv-file10.gofile.io/download/NxUTRf/C5.mp3');
+		sounds['C#5'] = new Audio('https://srv-file10.gofile.io/download/NxUTRf/C%235.mp3');
+		sounds['E5'] = new Audio('https://srv-file10.gofile.io/download/NxUTRf/E5.mp3');
+		sounds['A5'] = new Audio('https://srv-file10.gofile.io/download/NxUTRf/A5.mp3');
+	}
+
+	// initialize waves to render... assign frequency to each note
+	let waves = {};
+	let colors = {}
+	let timeInterval = 0;
+	function initializeWaves(){
+
+		if(waveSetting == 'single'){
+			waves = {};
+			waves['A4'] = 440.0; 
+			colors['A4'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			stopSound();
+			sounds['A4'].play();
+		}
+		else if( waveSetting == 'octave'){
+			waves = {};
+			waves['A4'] = 440.0; 
+			colors['A4'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			waves['A5'] = 880.0; 
+			colors['A5'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			stopSound();
+			sounds['A4'].play();
+			sounds['A5'].play();
+		}
+		else if( waveSetting == 'fifth'){
+			waves = {};
+			waves['A4'] = 440.0; 
+			colors['A4'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			waves['E5'] = 659.255; 
+			colors['E5'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			stopSound();
+			sounds['A4'].play();
+			sounds['E5'].play();
+		}
+		else if( waveSetting == 'major'){
+			waves = {};
+			waves['A4'] = 440.0; 
+			colors['A4'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			waves['C#5'] = 554.365; 
+			colors['C#5'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			waves['E5'] = 659.255; 
+			colors['E5'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			stopSound();
+			
+			sounds['A4'].play();
+			sounds['C#5'].play();
+			sounds['E5'].play();
+			
+		}
+		else if( waveSetting == 'minor'){
+			waves = {};
+			waves['A4'] = 440.0; 
+			colors['A4'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			waves['C5'] = 523.251; 
+			colors['C5'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			waves['E5'] = 659.255; 
+			colors['E5'] = color(Math.random()*255,Math.random()*255,Math.random()*255);
+			stopSound();
+			sounds['A4'].play();
+			sounds['C5'].play();
+			sounds['E5'].play();
+		}
+		/*
+
+		waves['A4'] = 440.0; 
+		waves['C5'] = 523.251; 
+		waves['E5'] = 659.255; 
+		waves['G5'] = 783.991; 
+		
+		colors['A4'] = color(235, 52, 103);
+		colors['C5'] = color(99, 240, 84);
+		colors['E5'] = color(127, 195, 240);
+		colors['G5'] = color(245, 242, 81);
+		*/
+	}
+
+
+	// draw 60x per second 
+	function draw(){
+		background(0); //reset to black
+		for(var wave in waves){
+			drawWave(waves[wave], colors[wave]);
+		}
+	}
+
+	/* draw wave
+		iterate thru waves to get y coord for each x value
+	*/
+	function drawWave(freq, color){
+		
+		let points = {}; // define x,y coords
+
+		//iterate from 0 to width...
+		let x = 0;
+		while(x <= windowWidth){
+			let y = (sin((x+timeInterval)*freq*zoomFactor))/(3.14159/2.0) * (windowHeight/2.0);
+			points[x] = y + (windowHeight/2.0);
+			stroke(color); // Change the color
+			strokeWeight(2); // Make the points 10 pixels in size
+			point(x, points[x]);
+			if(x > 0){
+				fill(color);
+				line(x-1, points[x-1], x, points[x]);
+			}
+			x++;
+		}
+		timeInterval+= (windowWidth/60.0)*timeDilation; //add enough pixels to traverse screen in 1 second
+	}
+
+
+	//stop sound
+	function stopSound(){
+		for(var sound in sounds){
+			sounds[sound].pause();
+			sounds[sound].currentTime = 0;
+		}
+		
+	}
+
+
+
+</script>
